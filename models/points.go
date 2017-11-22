@@ -1528,9 +1528,13 @@ func parseTags(buf []byte) Tags {
 		return nil
 	}
 
-	tags := make(Tags, 0, bytes.Count(buf, []byte(",")))
+	tags := make(Tags, bytes.Count(buf, []byte(",")))
+	p := 0
 	walkTags(buf, func(key, value []byte) bool {
-		tags = append(tags, NewTag(key, value))
+		tags[p].Key = key
+		tags[p].Value = value
+		p++
+		//tags = append(tags, NewTag(key, value))
 		return true
 	})
 	return tags

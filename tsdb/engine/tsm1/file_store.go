@@ -303,6 +303,26 @@ func (f *FileStore) WalkKeys(seek []byte, fn func(key []byte, typ byte) error) e
 		return nil
 	}
 
+	if len(f.files) == 1 {
+		// fast path
+		r := f.files[0]
+		f.mu.RUnlock()
+
+		start := 0
+		if len(seek) > 0 {
+			start = r.Seek(seek)
+		}
+		n := r.KeyCount()
+		for i := start; i < n; i++ {
+
+			key, typ := r.KeyAt(i)
+			if err := fn(key, typ); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
 	readers := make([]chan seriesKey, 0, len(f.files))
 	done := make(chan struct{})
 	for _, f := range f.files {

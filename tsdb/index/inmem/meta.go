@@ -249,7 +249,7 @@ func (m *Measurement) AddSeries(s *Series) bool {
 	}
 
 	// add this series id to the tag index on the measurement
-	s.ForEachTag(func(t models.Tag) {
+	for _, t := range s.tags {
 		valueMap := m.seriesByTagKeyValue[string(t.Key)]
 		if valueMap == nil {
 			valueMap = NewTagKeyValue()
@@ -264,7 +264,7 @@ func (m *Measurement) AddSeries(s *Series) bool {
 			sort.Sort(ids)
 		}
 		valueMap.Store(string(t.Value), ids)
-	})
+	}
 
 	return true
 }
@@ -1188,6 +1188,12 @@ func NewSeries(key []byte, tags models.Tags) *Series {
 		shardIDs:     make(map[uint64]struct{}),
 		lastModified: time.Now().UTC().UnixNano(),
 	}
+}
+
+func (s *Series) InitializeShard(shardID uint64) {
+	s.mu.Lock()
+	s.shardIDs[shardID] = struct{}{}
+	s.mu.Unlock()
 }
 
 func (s *Series) AssignShard(shardID uint64, ts int64) {

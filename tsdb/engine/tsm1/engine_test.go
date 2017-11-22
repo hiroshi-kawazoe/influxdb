@@ -816,6 +816,34 @@ func TestEngine_CreateCursor_Descending(t *testing.T) {
 	}
 }
 
+func makeBlockTypeSlice(n int) []byte {
+	r := make([]byte, n)
+	b := tsm1.BlockTypeMin
+	m := tsm1.BlockTypeMax+1
+	for i := 0; i < len(r); i++ {
+		r[i] = b % m
+	}
+	return r
+}
+
+func BenchmarkTsmFieldTypeToInfluxQLDataType(b *testing.B) {
+	t := makeBlockTypeSlice(100)
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < len(t); j++ {
+			tsm1.TsmFieldTypeToInfluxQLDataType(t[j])
+		}
+	}
+}
+
+func BenchmarkTsmFieldTypeToInfluxQLDataType2(b *testing.B) {
+	t := makeBlockTypeSlice(100)
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < len(t); j++ {
+			tsm1.BlockTypeToInfluxQLDataType(t[j])
+		}
+	}
+}
+
 func BenchmarkEngine_CreateIterator_Count_1K(b *testing.B) {
 	benchmarkEngineCreateIteratorCount(b, 1000)
 }

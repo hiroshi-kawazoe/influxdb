@@ -12,6 +12,8 @@ import (
 )
 
 const (
+	BlockTypeMin = BlockFloat64
+
 	// BlockFloat64 designates a block encodes float64 values.
 	BlockFloat64 = byte(0)
 
@@ -26,6 +28,8 @@ const (
 
 	// BlockUnsigned designates a block encodes uint64 values.
 	BlockUnsigned = byte(4)
+
+	BlockTypeMax = BlockUnsigned
 
 	// encodedBlockHeaderSize is the size of the header for an encoded block.  There is one
 	// byte encoding the type of the block.
