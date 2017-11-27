@@ -481,12 +481,14 @@ func (c *client) Query(q Query) (*Response, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", u.String(), nil)
+	values := url.Values{"q": []string{q.Command}}
+	body := bytes.NewReader([]byte(values.Encode()))
+	req, err := http.NewRequest("POST", u.String(), body)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Set("Content-Type", "")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("User-Agent", c.useragent)
 
 	if c.username != "" {
@@ -494,7 +496,6 @@ func (c *client) Query(q Query) (*Response, error) {
 	}
 
 	params := req.URL.Query()
-	params.Set("q", q.Command)
 	params.Set("db", q.Database)
 	params.Set("params", string(jsonParameters))
 	if q.Chunked {
